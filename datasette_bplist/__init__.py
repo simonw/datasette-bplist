@@ -1,9 +1,7 @@
-import json
-
 from datasette import hookimpl
-from bpylist import bplist
-
-import jinja2
+import plistlib
+import json
+import markupsafe
 
 
 @hookimpl
@@ -12,10 +10,11 @@ def prepare_connection(conn):
 
 
 def bplist_to_json(value):
-    try:
-        return json.dumps(bplist.parse(value), default=repr)
-    except Exception as ex:
-        return json.dumps({"error": str(ex)})
+    if value:
+        try:
+            return json.dumps(plistlib.loads(value), default=repr)
+        except Exception as ex:
+            return json.dumps({"error": str(ex)})
 
 
 @hookimpl
@@ -27,13 +26,14 @@ def render_cell(value):
         isinstance(value, str) and value.startswith("bplist00")
     ):
         try:
-            parsed = bplist.parse(value)
+            parsed = plistlib.loads(value)
         except Exception:
             return None
-        return jinja2.Markup(
+        return markupsafe.Markup(
             '<pre style="white-space: pre-wrap">{data}</pre>'.format(
-                data=jinja2.escape(json.dumps(parsed, default=repr, indent=4))
+                data=markupsafe.escape(json.dumps(parsed, default=repr, indent=4))
             )
         )
 
     return None
+

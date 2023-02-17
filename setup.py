@@ -23,7 +23,7 @@ setup(
     version=VERSION,
     packages=["datasette_bplist"],
     entry_points={"datasette": ["bplist = datasette_bplist"]},
-    install_requires=["datasette", "bpylist"],
+    install_requires=["datasette"],
     extras_require={"test": ["pytest"]},
     tests_require=["datasette-bplist[test]"],
 )
